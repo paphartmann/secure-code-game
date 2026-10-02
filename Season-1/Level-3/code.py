@@ -25,12 +25,16 @@ class TaxPayer:
     def get_prof_picture(self, path=None):
         # setting a profile picture is optional
         if not path:
-            pass
+            return None
+
+        # disallow absolute paths from user input
+        if os.path.isabs(path):
+            return None
 
         # builds and validates path against a safe base directory
         base_dir = os.path.dirname(os.path.abspath(__file__))
         base_dir_real = os.path.realpath(base_dir)
-        prof_picture_path = os.path.realpath(os.path.join(base_dir_real, path))
+        prof_picture_path = os.path.realpath(os.path.normpath(os.path.join(base_dir_real, path)))
 
         # allow access only within base_dir
         if os.path.commonpath([base_dir_real, prof_picture_path]) != base_dir_real:
