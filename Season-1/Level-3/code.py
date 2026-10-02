@@ -53,10 +53,6 @@ class TaxPayer:
         if not path:
             raise Exception("Error: Tax form is required for all users")
 
-        # disallow absolute paths from user input
-        if os.path.isabs(path):
-            return None
-
         # builds and validates path against a safe base directory
         base_dir = os.path.dirname(os.path.abspath(__file__))
         base_dir_real = os.path.realpath(base_dir)
