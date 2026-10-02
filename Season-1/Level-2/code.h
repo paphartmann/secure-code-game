@@ -62,6 +62,10 @@ int create_user_account(bool isAdmin, const char *username) {
     ua->isAdmin = isAdmin;
     ua->userid = userid_next++;
     strcpy(ua->username, username);
+    // first reading hypothesis: strcpy uses \0 to determine end of string,
+    // if you feed it a string without that,
+    // it may print the memory beyond the string because it doesnt know where it ends
+    
     memset(&ua->setting, 0, sizeof ua->setting);
     accounts[userid_next] = ua;
     return userid_next++;
@@ -80,7 +84,7 @@ bool update_setting(int user_id, const char *index, const char *value) {
         return false;
 
     v = strtol(value, &endptr, 10);
-    if (*endptr || i >= SETTINGS_COUNT)
+    if (*endptr || i >= SETTINGS_COUNT || i < 0) // before the variable i didnt check if its smaller than 0
         return false;
     accounts[user_id]->setting[i] = v;
     return true;
