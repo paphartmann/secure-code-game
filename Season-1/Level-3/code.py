@@ -27,15 +27,13 @@ class TaxPayer:
         if not path:
             pass
 
-        # defends against path traversal attacks
-        if path.startswith('/') or '..' in path: # it was only checking the first component of the path. that is not enough to mitigate it
-            return None
-
-        # builds path
+        # builds and validates path against a safe base directory
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        prof_picture_path = os.path.normpath(os.path.join(base_dir, path))
+        base_dir_real = os.path.realpath(base_dir)
+        prof_picture_path = os.path.realpath(os.path.join(base_dir_real, path))
 
-        if '..' in prof_picture_path:
+        # allow access only within base_dir
+        if os.path.commonpath([base_dir_real, prof_picture_path]) != base_dir_real:
             return None
 
         with open(prof_picture_path, 'rb') as pic:
