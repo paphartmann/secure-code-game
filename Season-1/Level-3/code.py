@@ -52,12 +52,22 @@ class TaxPayer:
 
         if not path:
             raise Exception("Error: Tax form is required for all users")
-        
-        if '..' in path: # it didnt mitigate for path traversal attacks
+
+        # disallow absolute paths from user input
+        if os.path.isabs(path):
             return None
 
-        with open(path, 'rb') as form:
+        # builds and validates path against a safe base directory
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir_real = os.path.realpath(base_dir)
+        tax_form_path = os.path.realpath(os.path.normpath(os.path.join(base_dir_real, path)))
+
+        # allow access only within base_dir
+        if os.path.commonpath([base_dir_real, tax_form_path]) != base_dir_real:
+            return None
+
+        with open(tax_form_path, 'rb') as form:
             tax_data = bytearray(form.read())
 
         # assume that tax data is returned on screen after this
-        return path
+        return tax_form_path
