@@ -28,7 +28,7 @@ class TaxPayer:
             pass
 
         # defends against path traversal attacks
-        if path.startswith('/') or path.startswith('..'):
+        if path.startswith('/') or '..' in path: # it was only checking the first component of the path. that is not enough to mitigate it
             return None
 
         # builds path
@@ -47,6 +47,9 @@ class TaxPayer:
 
         if not path:
             raise Exception("Error: Tax form is required for all users")
+        
+        if '..' in path: # it didnt mitigate for path traversal attacks
+            return None
 
         with open(path, 'rb') as form:
             tax_data = bytearray(form.read())
