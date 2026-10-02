@@ -35,6 +35,9 @@ class TaxPayer:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         prof_picture_path = os.path.normpath(os.path.join(base_dir, path))
 
+        if '..' in prof_picture_path:
+            return None
+
         with open(prof_picture_path, 'rb') as pic:
             picture = bytearray(pic.read())
 
