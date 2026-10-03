@@ -224,13 +224,23 @@ class DB_CRUD_ops(object):
 
             res = "[METHOD EXECUTED] exec_user_script\n"
             res += "[QUERY] " + query + "\n"
-            if ';' in query:
-                res += "[SCRIPT EXECUTION]"
-                cur.executescript(query)
+
+            for single_query in filter(None, query.split(';')):
+                single_query = single_query.strip()
+                match = re.fullmatch(
+                    r"SELECT\s+(price|\*)\s+FROM\s+stocks\s+WHERE\s+symbol\s*=\s*'([A-Za-z0-9_]+)'",
+                    single_query,
+                    re.IGNORECASE
+                )
+                if not match:
+                    raise ValueError("Only SELECT price/* FROM stocks WHERE symbol = 'SYMBOL' is allowed.")
+
+                selected_column = match.group(1)
+                stock_symbol = match.group(2)
+                safe_query = f"SELECT {selected_column} FROM stocks WHERE symbol = ?"
+                cur.execute(safe_query, (stock_symbol,))
                 db_con.commit()
-            else:
-                cur.execute(query)
-                db_con.commit()
+
                 query_outcome = cur.fetchall()
                 for result in query_outcome:
                     res += "[RESULT] " + str(result)
