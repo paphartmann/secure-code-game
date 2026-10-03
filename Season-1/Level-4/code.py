@@ -239,8 +239,10 @@ class DB_CRUD_ops(object):
 
                 selected_column = match.group(1)
                 stock_symbol = match.group(2)
-                safe_query = f"SELECT {selected_column} FROM stocks WHERE symbol = ?"
-                cur.execute(safe_query, (stock_symbol,))
+                if selected_column.lower() == "price":
+                    cur.execute("SELECT price FROM stocks WHERE symbol = ?", (stock_symbol,))
+                else:
+                    cur.execute("SELECT * FROM stocks WHERE symbol = ?", (stock_symbol,))
                 db_con.commit()
 
                 query_outcome = cur.fetchall()
