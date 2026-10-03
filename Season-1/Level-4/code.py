@@ -11,6 +11,7 @@ the tests.py again to recreate it.
 
 import sqlite3
 import os
+import re
 from flask import Flask, request
 
 ### Unrelated to the exercise -- Starts here -- Please ignore
@@ -183,7 +184,18 @@ class DB_CRUD_ops(object):
             for query in filter(None, query.split(';')):
                 res += "[QUERY]" + query + "\n"
                 query = query.strip()
-                cur.execute(query)
+                match = re.fullmatch(
+                    r"SELECT\s+(price|\*)\s+FROM\s+stocks\s+WHERE\s+symbol\s*=\s*'([A-Za-z0-9_]+)'",
+                    query,
+                    re.IGNORECASE
+                )
+                if not match:
+                    raise ValueError("Only SELECT price/* FROM stocks WHERE symbol = 'SYMBOL' is allowed.")
+
+                selected_column = match.group(1)
+                stock_symbol = match.group(2)
+                safe_query = f"SELECT {selected_column} FROM stocks WHERE symbol = ?"
+                cur.execute(safe_query, (stock_symbol,))
                 db_con.commit()
 
                 query_outcome = cur.fetchall()
