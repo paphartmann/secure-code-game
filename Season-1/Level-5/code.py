@@ -21,8 +21,9 @@ class Random_generator:
 
     # generates salt
     def generate_salt(self, rounds=12):
-        salt = ''.join(str(random.randint(0, 9)) for _ in range(21)) + '.'
-        return f'$2b${rounds}${salt}'.encode()
+        return bcrypt.gensalt(rounds)
+    # before the code was reinventing the wheel by implementing the salt generator from scratch
+    # i had to look at the solution because i didnt know the library had such a function
 
 class SHA256_hasher:
 
@@ -37,7 +38,7 @@ class SHA256_hasher:
     def password_verification(self, password, password_hash):
         return bcrypt.checkpw(password.encode(), password_hash)
 
-""" 
+"""                 insecure hash function for a password
 class MD5_hasher:
 
     # same as above but using a different algorithm to hash which is MD5
@@ -53,9 +54,9 @@ class MD5_hasher:
 # a collection of sensitive secrets necessary for the software to operate
 PRIVATE_KEY = os.environ.get('PRIVATE_KEY')
 PUBLIC_KEY = os.environ.get('PUBLIC_KEY')
-SECRET_KEY = 'TjWnZr4u7x!A%D*G-KaPdSgVkXp2s5v8'
-PASSWORD_HASHER = 'MD5_hasher'
-
+# SECRET_KEY = 'TjWnZr4u7x!A%D*G-KaPdSgVkXp2s5v8' # hardcoded secret
+SECRET_KEY = os.environ.get('SECRET_KEY')
+PASSWORD_HASHER = 'bcrypt_hasher'
 
 # Contribute new levels to the game in 3 simple steps!
 # Read our Contribution Guideline at github.com/skills/secure-code-game/blob/main/CONTRIBUTING.md
