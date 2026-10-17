@@ -43,7 +43,7 @@ user_account *accounts[MAX_USERS];
 // constants (see #DEFINEs) constitute the API of this module
 
 // Creates a new user account and returns it's unique identifier
-int create_user_account(bool isAdmin, char *username) {
+int create_user_account(bool isAdmin, const char *username) {
     if (userid_next >= MAX_USERS) {
         fprintf(stderr, "the maximum number of users have been exceeded");
         return INVALID_USER_ID;
